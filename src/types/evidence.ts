@@ -51,6 +51,7 @@ export interface UserControlEvidence {
 export interface PresenterEvidence {
   id: string;
   path: string;
+  modelRefs: string[];
 }
 
 export interface ScanIndex {

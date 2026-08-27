@@ -46,7 +46,7 @@ export async function renderScan(container, refreshShell) {
   list.innerHTML = `<h3>Pages</h3><ul>${index.pages.map((p) => `<li><a data-page="${esc(p)}">${esc(p)}</a></li>`).join("")}</ul>`;
   const detail = document.createElement("div");
   detail.className = "card";
-  detail.textContent = "Select a page to view its scan evidence.";
+  detail.textContent = "Select a page or presenter to view its scan evidence.";
   list.querySelectorAll("[data-page]").forEach((a) => {
     a.addEventListener("click", async () => {
       const page = await api.getScanPage(a.dataset.page);
@@ -67,7 +67,26 @@ export async function renderScan(container, refreshShell) {
       `;
     });
   });
-  container.append(list, detail);
+
+  const presenterList = document.createElement("div");
+  presenterList.className = "card";
+  presenterList.innerHTML = `<h3>Presenters</h3>${
+    index.presenters.length
+      ? `<ul>${index.presenters.map((p) => `<li><a data-presenter="${esc(p)}">${esc(p)}</a></li>`).join("")}</ul>`
+      : '<div class="muted">none found</div>'
+  }`;
+  presenterList.querySelectorAll("[data-presenter]").forEach((a) => {
+    a.addEventListener("click", async () => {
+      const presenter = await api.getScanPresenter(a.dataset.presenter);
+      detail.innerHTML = `
+        <h3>${esc(presenter.id)}</h3>
+        <div>Path: ${esc(presenter.path)}</div>
+        <div>Models: ${presenter.modelRefs.map(esc).join(", ") || "none"}</div>
+      `;
+    });
+  });
+
+  container.append(list, presenterList, detail);
 
   const gate = await api.getGate("scan").catch(() => null);
   container.append(

@@ -89,6 +89,10 @@ export function createApp(store: MigrationStore): express.Express {
     res.json(await readJson(path.join(store.scanPagesDir, `${req.params.pageId}.json`)));
   }));
 
+  app.get("/api/scan/presenters/:presenterId", wrapRead(async (req, res, store) => {
+    res.json(await readJson(path.join(store.scanPresentersDir, `${req.params.presenterId}.json`)));
+  }));
+
   app.get("/api/crawl/index", wrapRead(async (_req, res, store) => {
     res.json(await readJson(store.crawlIndexFile));
   }));

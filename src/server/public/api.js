@@ -20,6 +20,7 @@ export const api = {
 
   getScanIndex: () => request("GET", "/api/scan/index"),
   getScanPage: (pageId) => request("GET", `/api/scan/pages/${encodeURIComponent(pageId)}`),
+  getScanPresenter: (presenterId) => request("GET", `/api/scan/presenters/${encodeURIComponent(presenterId)}`),
   runScan: (sourceRoot) => request("POST", "/api/stages/scan", { sourceRoot }),
 
   getCrawlIndex: () => request("GET", "/api/crawl/index"),

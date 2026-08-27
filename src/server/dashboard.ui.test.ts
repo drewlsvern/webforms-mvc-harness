@@ -120,7 +120,7 @@ test("dashboard: console shows a start/summary pair for scan", async () => {
 
     await page.click('[data-action="run"]');
     await page.waitForSelector("text=Scan — running…", { timeout: 10000 });
-    await page.waitForSelector("text=Done — 6 page(s), 1 control(s), 0 presenter(s).", { timeout: 10000 });
+    await page.waitForSelector("text=Done — 6 page(s), 1 control(s), 1 presenter(s).", { timeout: 10000 });
   });
 });
 

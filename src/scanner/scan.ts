@@ -11,11 +11,13 @@ import type { MigrationStore } from "../store/paths.ts";
 import { pageEvidencePaths } from "../store/paths.ts";
 import { writeArtifact, writeJson } from "../store/jsonFile.ts";
 import { renderScanPage } from "../store/markdown/renderScanPage.ts";
+import { renderPresenter } from "../store/markdown/renderPresenter.ts";
 import { createPendingGate } from "../store/gate.ts";
 import { emitProgress } from "../pipeline/progress.ts";
 import { parseMarkup } from "./parseMarkup.ts";
-import { parseCodeBehind } from "./parseCodeBehind.ts";
+import { parseCodeBehind, findModelRefs } from "./parseCodeBehind.ts";
 import { resolveAppRelative, toPosix } from "./resolvePath.ts";
+import { resolvePresenterId } from "./resolvePresenter.ts";
 import { walkFiles } from "./walk.ts";
 
 export interface ScanResult {
@@ -44,6 +46,22 @@ export async function runScan(sourceRoot: string, store: MigrationStore): Promis
     (f) => f.toLowerCase().endsWith(".cs") && !f.toLowerCase().endsWith(".designer.cs") && /presenter/i.test(path.basename(f)),
   );
 
+  // Presenters are parsed before pages so each page can resolve its
+  // presenterRef and roll that presenter's models into its own modelRefs.
+  const presenters: PresenterEvidence[] = [];
+  for (const presenterFile of presenterFiles) {
+    const relPath = toPosix(path.relative(sourceRoot, presenterFile));
+    const id = path.basename(presenterFile).replace(/\.cs$/i, "");
+    const modelRefs = findModelRefs(await readFile(presenterFile, "utf8"));
+    const evidence: PresenterEvidence = { id, path: relPath, modelRefs };
+    presenters.push(evidence);
+    const presenterJsonPath = path.join(store.scanPresentersDir, `${sanitizeForPath(id)}.json`);
+    const presenterMdPath = path.join(store.scanPresentersDir, `${sanitizeForPath(id)}.md`);
+    await writeArtifact(presenterJsonPath, presenterMdPath, evidence, renderPresenter);
+  }
+  const presentersById = new Map(presenters.map((p) => [p.id, p]));
+  const presenterIds = presenters.map((p) => p.id);
+
   const pages: PageScanEvidence[] = [];
 
   for (const aspxFile of aspxFiles) {
@@ -71,6 +89,10 @@ export async function runScan(sourceRoot: string, store: MigrationStore): Promis
 
     const userControlRefs = [...new Set(markup.userControlTagRefs.map((src) => resolveAppRelative(pageDir, src)))];
 
+    const resolvedPresenterId = codeBehind.presenterRef ? resolvePresenterId(codeBehind.presenterRef, presenterIds) : null;
+    const presenterModelRefs = resolvedPresenterId ? (presentersById.get(resolvedPresenterId)?.modelRefs ?? []) : [];
+    const modelRefs = [...new Set([...codeBehind.modelRefs, ...presenterModelRefs])];
+
     const page: PageScanEvidence = {
       pageId,
       path: pageId,
@@ -79,7 +101,7 @@ export async function runScan(sourceRoot: string, store: MigrationStore): Promis
       controls: markup.controls,
       navigationEdges,
       presenterRef: codeBehind.presenterRef,
-      modelRefs: codeBehind.modelRefs,
+      modelRefs,
       userControlRefs,
     };
     pages.push(page);
@@ -94,15 +116,6 @@ export async function runScan(sourceRoot: string, store: MigrationStore): Promis
     const evidence: UserControlEvidence = { id, path: id };
     controls.push(evidence);
     await writeJson(path.join(store.scanControlsDir, `${sanitizeForPath(id)}.json`), evidence);
-  }
-
-  const presenters: PresenterEvidence[] = [];
-  for (const presenterFile of presenterFiles) {
-    const relPath = toPosix(path.relative(sourceRoot, presenterFile));
-    const id = path.basename(presenterFile).replace(/\.cs$/i, "");
-    const evidence: PresenterEvidence = { id, path: relPath };
-    presenters.push(evidence);
-    await writeJson(path.join(store.scanPresentersDir, `${sanitizeForPath(id)}.json`), evidence);
   }
 
   const index: ScanIndex = {
