@@ -1,0 +1,72 @@
+{
+  "pageId": "KeepNotesWebForms/Default.aspx",
+  "path": "KeepNotesWebForms/Default.aspx",
+  "codeBehindPath": "KeepNotesWebForms/Default.aspx.cs",
+  "masterPage": null,
+  "controls": [
+    {
+      "id": "pnlError",
+      "type": "asp:Panel"
+    },
+    {
+      "id": "litError",
+      "type": "asp:Literal"
+    },
+    {
+      "id": "txtNewTitle",
+      "type": "asp:TextBox"
+    },
+    {
+      "id": "txtNewContent",
+      "type": "asp:TextBox"
+    },
+    {
+      "id": "ddlNewColor",
+      "type": "asp:DropDownList"
+    },
+    {
+      "id": "btnAddNote",
+      "type": "asp:Button"
+    },
+    {
+      "id": "NotesList",
+      "type": "asp:ListView"
+    },
+    {
+      "id": "itemPlaceholder",
+      "type": "asp:PlaceHolder"
+    },
+    {
+      "id": "anon-1",
+      "type": "asp:LinkButton"
+    },
+    {
+      "id": "anon-2",
+      "type": "asp:LinkButton"
+    },
+    {
+      "id": "txtEditTitle",
+      "type": "asp:TextBox"
+    },
+    {
+      "id": "txtEditContent",
+      "type": "asp:TextBox"
+    },
+    {
+      "id": "ddlEditColor",
+      "type": "asp:DropDownList"
+    },
+    {
+      "id": "anon-3",
+      "type": "asp:LinkButton"
+    },
+    {
+      "id": "anon-4",
+      "type": "asp:LinkButton"
+    }
+  ],
+  "navigationEdges": [],
+  "presenterRef": "NotesPresenter",
+  "modelRefs": [],
+  "userControlRefs": []
+}

@@ -1,0 +1,24 @@
+{
+  "name": "webforms-mvc-migration-tool",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Local-analysis discovery and slicing tool for migrating an ASP.NET WebForms (MVVP) frontend to .NET 10 MVC.",
+  "bin": {
+    "migrate": "src/cli/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test src/**/*.test.ts",
+    "server": "node src/server/index.ts"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "playwright": "^1.48.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/express": "^4.17.0",
+    "@types/node": "^22.0.0"
+  }
+}
